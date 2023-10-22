@@ -1,0 +1,46 @@
+version: '3.12'
+
+services:
+  web:
+    build: .
+    command: [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  makemigrations:
+    build: .
+    command: [ "python", "manage.py", "makemigrations" ]
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  migrate:
+    build: .
+    command: [ "python", "manage.py", "migrate" ]
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+volumes:
+  postgres_data:

@@ -9,6 +9,12 @@ class PersonSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    members = PersonSerializer(many=True, read_only=True)
+
     class Meta:
         model = Team
         fields = '__all__'
+
+
+class TeamMember(serializers.Serializer):
+    person_id = serializers.IntegerField()

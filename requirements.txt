@@ -1,0 +1,11 @@
+pip
+pytz
+asgiref
+sqlparse
+tzdata
+setuptools
+
+Django==4.2.6
+djangorestframework==3.14.0
+drf-yasg
+psycopg2-binary>=2.8,<3.0

@@ -1,0 +1,18 @@
+{% extends "drf-yasg/redoc.html" %}
+
+{% block content %}
+    <h2>Как установить</h2>
+    <p>Здесь инструкции по установке...</p>
+
+    <h2>Как запустить</h2>
+    <p>Здесь инструкции по запуску...</p>
+
+    <!-- Здесь можно вставить ReDoc -->
+    <div id="redoc"></div>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+    <script>
+        Redoc.init('/path_to_your_api_schema/', {
+            scrollYOffset: 50
+        }, document.getElementById('redoc'));
+    </script>
+{% endblock %}
