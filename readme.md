@@ -1,41 +1,46 @@
-# REST API для "команд" і "людей"
 
-## Зміст
+# REST API for "Teams" and "People"
 
-1. [Технічне завдання](#технічне-завдання)
-2. [Стек викорастаних технологій](#стек)
-3. [Встановлення](#встановлення)
-4. [Запуск](#запуск)
-5. [Додаткова інформація](#Додаткова-інформація)
+This project is a RESTful API that provides CRUD (Create, Read, Update, Delete) operations for managing "teams" and the "people" within those teams.
+## Table of Contents
 
-### Технічне завдання
+1. [Tech Stack](#tech-stack)
+2. [Installation](#installation)
+3. [Running the Project](#running-the-project)
+4. [Additional Information](#additional-information)
+## Tech Stack
 
-Створення REST API з кінцевими точками CRUD (створення, читання, оновлення, видалення) для "команд" і "людей в цих командах".
+- **WEB-server**: Django
+- **Database**: PostgreSQL 13
+- **Containerization**: Docker
+- **OPEN API Documentation**: Yasg/Swagger
+## Installation
 
-### Стек
+**Prerequisites**: Ensure Docker is installed on your system.
+**Clone the Repository**: Use your preferred method to clone the project repository to your local machine.
+**Build the Project**: Navigate to the project directory and execute the following command to build the necessary components:
+```bash
+docker-compose build
+```
+## Running the Project
 
-- **WEB-сервер**: Django
-- **База данных**: PostgreSQL 13
-- **Контейниризация**: Docker
-- **OPEN API Документація**: Yasg/Swagger
+1. Start the project using the following command:
+```bash
+docker-compose up
+```
+2. Access the API documentation by navigating to: http://127.0.0.1:8000/docs/ in your preferred web browser.
+---
+**NOTE:** If you encounter any access issues, please ensure that port 8000 is not being used by other services on your system.
+---
 
-### Встановлення
+## Additional Information
 
+If there are any changes to the database models or structure, you will need to generate and apply migrations. This ensures that the database schema remains consistent with the codebase. Use the following commands to manage migrations:
 
-1. Переконайтеся, що у вас встановлений Docker.
-2. Склонуйте репозиторій проекта.
-3. Перейдіть у директорію проекта та виконайте команду: `docker-compose build` для збірки проекта.
-
-### Запуск
-
-Після встановлення, запустіть проект командою: docker-compose up.
-Додаток повинен бути доступний за адресою: `http://127.0.0.1:8000/docs/`. </br>
-Якщо виникли проблеми з доступом, переконайтеся, що порт 8000 вільний та жодні інші служби його не використовують.
-
-
-### Додаткова інформація
-
-У разі змін моделей або структури бази даних, виконайте наступні команди для генерації та застосування міграцій:
-
-- `docker-compose run makemigrations`
-- `docker-compose run migrate`
+- Generate migrations based on changes:
+```bash
+docker-compose run makemigrations
+```
+- Apply the generated migrations to update the database schema:
+```bash
+docker-compose run migrate
