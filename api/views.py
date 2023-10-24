@@ -12,34 +12,35 @@ class PersonViewSet(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
     queryset = Person.objects.all()
 
-    class Meta:
-        swagger_tags =['Команды']
-
-    """ GET /persons/ """
+    """ Endpoint to retrieve all persons """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное получение списка", schema=PersonSerializer()),
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully retrieved list.", schema=PersonSerializer()
+            ),
         }
     )
     def list(self, request, **kwargs):
-        # Обработка GET /persons/
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+        """ Handle GET /persons/ """
+        queryset = self.queryset
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    """ POST /persons/ """
+    """ Endpoint to create a new person """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_201_CREATED: openapi.Response(description="Успешное создание человека",
-                                                      schema=PersonSerializer()),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных"
+            status.HTTP_201_CREATED: openapi.Response(
+                description="Successfully created person.",
+                schema=PersonSerializer()
+            ),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data."
         }
     )
     def create(self, request, *args, **kwargs):
-        # Обработка POST /persons/
-        serializer = self.get_serializer(data=request.data)
+        """ Handle POST /persons/ """
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -47,38 +48,47 @@ class PersonViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    """ GET /persons/{id}/ """
+    """ Endpoint to retrieve a specific person by ID """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное получение информации об человеке.",
-                                                 schema=PersonSerializer()),
-            status.HTTP_404_NOT_FOUND: "Человек с указанным ID не найден."
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully retrieved person's information.",
+                schema=PersonSerializer()
+            ),
+            status.HTTP_404_NOT_FOUND: "Person with the specified ID not found."
         }
     )
     def retrieve(self, request, pk=None, *args, **kwargs):
-        # Обработка GET /persons/{id}/
+        """ Handle GET /persons/{id}/ """
         try:
             instance = self.get_object()
-            serializer = self.get_serializer(instance)
+            serializer = self.serializer_class(instance)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Person.DoesNotExist:
-            return Response(data={"detail": "Человек с указанным ID не найден."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                data={"detail": "Person with the specified ID not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    """ Endpoint to update a person's details """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное обновление данных о человеке.",
-                                                 schema=PersonSerializer()),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных.",
-            status.HTTP_404_NOT_FOUND: "Человек с указанным ID не найден."
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully updated person's data.",
+                schema=PersonSerializer()
+            ),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data.",
+            status.HTTP_404_NOT_FOUND: "Person with the specified ID not found."
         }
     )
     def update(self, request, pk=None, *args, **kwargs):
-        # Обработка PUT /persons/{id}/
+        """ Handle PUT /persons/{id}/ """
         try:
             instance = self.get_object()
-            serializer = self.get_serializer(instance, data=request.data)
+            serializer = self.serializer_class(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -86,24 +96,28 @@ class PersonViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Person.DoesNotExist:
-            return Response(data={"detail": "Человек с указанным ID не найден"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                data={"detail": "Person with the specified ID not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-    """ PATCH /persons/{id}/ """
+    """ Endpoint to partially update a person's details """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное частичное обновление данных о человеке.",
-                                                 schema=PersonSerializer()),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных.",
-            status.HTTP_404_NOT_FOUND: "Человек с указанным ID не найден."
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully partially updated person's data.",
+                schema=PersonSerializer()
+            ),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data.",
+            status.HTTP_404_NOT_FOUND: "Person with the specified ID not found."
         }
     )
     def partial_update(self, request, pk=None, *args, **kwargs):
-        # Обработка PATCH /persons/{id}/
-
+        """ Handle PATCH /persons/{id}/ """
         try:
             instance = self.get_object()
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer = self.serializer_class(instance, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -111,184 +125,242 @@ class PersonViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Person.DoesNotExist:
-            return Response(data={"detail": "Человек с указанным ID не найден"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"detail": "Person with the specified ID not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    """ DELETE /persons/{id}/ """
+    """ Endpoint to delete a specific person by ID """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_204_NO_CONTENT: "Успешное удаление человека.",
-            status.HTTP_404_NOT_FOUND: "Человек с указанным ID не найден."
+            status.HTTP_204_NO_CONTENT: "Successfully deleted person.",
+            status.HTTP_404_NOT_FOUND: "Person with the specified ID not found."
         }
     )
     def destroy(self, request, pk=None, *args, **kwargs):
-        # Обработка DELETE /persons/{id}/
-
+        """ Handle DELETE /persons/{id}/ """
         try:
             instance = self.get_object()
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Person.DoesNotExist:
-            return Response(data={"detail": "Человек с указанным ID не найден"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                data={"detail": "Person with the specified ID not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamSerializer
     queryset = Team.objects.all()
 
-    """ GET /teams/ """
+    """ Endpoint to retrieve all teams """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное получение списка команд",
-                                                 schema=TeamSerializer(many=True)),
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully retrieved list of teams.",
+                schema=TeamSerializer(many=True)
+            ),
         }
     )
     def list(self, request, **kwargs):
-        # Обработка GET /teams/
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+        """ Handle GET /teams/ """
+        queryset = self.queryset
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    """ POST /teams/ """
+    """ Endpoint to create a new team """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_201_CREATED: openapi.Response(description="Успешное создание команды", schema=TeamSerializer()),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных"
+            status.HTTP_201_CREATED: openapi.Response(
+                description="Successfully created team.",
+                schema=TeamSerializer()
+            ),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data."
         }
     )
     def create(self, request, *args, **kwargs):
-        # Обработка POST /teams/ (teams_create)
-        serializer = self.get_serializer(data=request.data)
+        """ Handle POST /teams/ """
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    """ GET /teams/{id}/ """
+    """ Endpoint to retrieve team details by ID """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное получение деталей команды",
-                                                 schema=TeamSerializer()),
-            status.HTTP_404_NOT_FOUND: "Команда с указанным ID не найдена"
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully retrieved team details.",
+                schema=TeamSerializer()
+            ),
+            status.HTTP_404_NOT_FOUND: "Team with the given ID not found."
         }
     )
     def retrieve(self, request, pk=None, *args, **kwargs):
-        # Обработка GET /teams/{id}/
+        """ Handle GET /teams/{id}/ """
         try:
             instance = self.get_object()
-            serializer = self.get_serializer(instance)
+            serializer = self.serializer_class(instance)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Team.DoesNotExist:
-            return Response(data={"detail": "Команда с указанным ID не найдена"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                data={"detail": "Team with the given ID not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-    """ PUT /teams/{id}/ """
+    """ Endpoint to update team details by ID """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное обновление данных о команде",
-                                                 schema=TeamSerializer()),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных",
-            status.HTTP_404_NOT_FOUND: "Команда с указанным ID не найдена"
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully updated team details.",
+                schema=TeamSerializer()
+            ),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data.",
+            status.HTTP_404_NOT_FOUND: "Team with the given ID not found."
         }
     )
     def update(self, request, pk=None, *args, **kwargs):
-        # Обработка PUT /teams/{id}/
+        """ Handle PUT /teams/{id}/ """
         try:
             instance = self.get_object()
-            serializer = self.get_serializer(instance, data=request.data)
+            serializer = self.serializer_class(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Team.DoesNotExist:
-            return Response(data={"detail": "Команда с указанным ID не найдена"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                data={"detail": "Team with the given ID not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-    """ PATCH /teams/{id}/ """
+    """ Endpoint to partially update team details by ID """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное частичное обновление данных о команде",
-                                                 schema=TeamSerializer()),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных",
-            status.HTTP_404_NOT_FOUND: "Команда с указанным ID не найдена"
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully partially updated team details.",
+                schema=TeamSerializer()
+            ),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data.",
+            status.HTTP_404_NOT_FOUND: "Team with the given ID not found."
         }
     )
     def partial_update(self, request, pk=None, *args, **kwargs):
-        # Обработка PATCH /teams/{id}/
+        """ Handle PATCH /teams/{id}/ """
         try:
             instance = self.get_object()
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer = self.serializer_class(instance, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Team.DoesNotExist:
-            return Response(data={"detail": "Команда с указанным ID не найдена"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                data={"detail": "Team with the given ID not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-    """ DELETE /teams/{id}/ """
+    """ Endpoint to delete a team by ID """
 
     @swagger_auto_schema(
         responses={
-            status.HTTP_204_NO_CONTENT: "Успешное удаление команды",
-            status.HTTP_404_NOT_FOUND: "Команда с указанным ID не найдена"
+            status.HTTP_204_NO_CONTENT: "Successfully deleted the team.",
+            status.HTTP_404_NOT_FOUND: "Team with the given ID not found."
         }
     )
     def destroy(self, request, pk=None, *args, **kwargs):
-        # Обработка DELETE /teams/{id}/
+        """ Handle DELETE /teams/{id}/ """
         try:
             instance = self.get_object()
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Team.DoesNotExist:
-            return Response(data={"detail": "Команда с указанным ID не найдена"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                data={"detail": "Team with the given ID not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-    """ POST /teams/{id}/add_member/ """
+    """ Endpoint to add a member to the team by ID """
 
     @swagger_auto_schema(
         method='post',
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное добавление члена в команду."),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных или пользователь уже в команде.",
-            status.HTTP_404_NOT_FOUND: "Команда или человек с указанным ID не найдены."
+            status.HTTP_200_OK: openapi.Response(description="Successfully added member to the team."),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data or user is already a team member.",
+            status.HTTP_404_NOT_FOUND: "Team or person with the given ID not found."
         }
     )
     @action(detail=True, methods=['post'], url_path='add_member', serializer_class=TeamMember)
-    # Обработка POST /teams/{id}/add_member/
     def add_member(self, request, pk=None):
-        team = self.get_object()
+        """ Handle POST /teams/{id}/add_member/ """
+        try:
+            team = self.get_object()
+        except Team.DoesNotExist:
+            return Response(
+                data={'status': 'Team with the given ID not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         person_id = request.data.get('person_id')
         try:
             person = Person.objects.get(id=person_id)
         except Person.DoesNotExist:
-            return Response({'status': 'person not found'}, status=404)
-        team.members.add(person)
-        return Response({'status': 'member added'})
+            return Response(
+                data={'status': 'Person with the given ID not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-    """ POST /teams/{id}/remove_member/ """
+        team.members.add(person)
+        return Response(
+            data={'status': 'Successfully added member to the team.'},
+            status=status.HTTP_200_OK
+        )
+
+    """ Endpoint to remove a member from the team by ID """
 
     @swagger_auto_schema(
         method='post',
         responses={
-            status.HTTP_200_OK: openapi.Response(description="Успешное удаление члена из команды."),
-            status.HTTP_400_BAD_REQUEST: "Ошибка в переданных данных или пользователь не является членом команды.",
-            status.HTTP_404_NOT_FOUND: "Команда или человек с указанным ID не найдены."
+            status.HTTP_200_OK: openapi.Response(description="Successfully removed member from the team."),
+            status.HTTP_400_BAD_REQUEST: "Error in the provided data or user is not a team member.",
+            status.HTTP_404_NOT_FOUND: "Team or person with the given ID not found."
         }
     )
     @action(detail=True, methods=['post'], url_path='remove_member', serializer_class=TeamMember)
     def remove_member(self, request, pk=None):
-        # Обработка POST /teams/{id}/remove_member/
-        team = self.get_object()
-        person_id = request.data.get('person_id')
+        """ Handle POST /teams/{id}/remove_member/ """
+        try:
+            team = self.get_object()
+            person_id = request.data.get('person_id')
+        except Team.DoesNotExist:
+            return Response(
+                data={'status': 'Team with the given ID not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         try:
             person = Person.objects.get(id=person_id)
         except Person.DoesNotExist:
-            return Response({'status': 'person not found'}, status=404)
+            return Response(
+                data={'status': 'Person with the given ID not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         if person not in team.members:
-            return Response({'status': 'member removed'})
+            return Response(
+                data={'status': 'Error in the provided data or user is not a team member'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         team.members.remove(person)
+        return Response(
+            data={'status': 'Successfully removed member from the team'},
+            status=status.HTTP_200_OK
+        )
