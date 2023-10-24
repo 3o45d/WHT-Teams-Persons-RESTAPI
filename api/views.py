@@ -1,3 +1,4 @@
+from django.http import Http404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
@@ -302,9 +303,9 @@ class TeamViewSet(viewsets.ModelViewSet):
         """ Handle POST /teams/{id}/add_member/ """
         try:
             team = self.get_object()
-        except Team.DoesNotExist:
+        except Http404:
             return Response(
-                data={'status': 'Team with the given ID not found.'},
+                data={'detail': 'Team with the given ID not found.'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -313,7 +314,7 @@ class TeamViewSet(viewsets.ModelViewSet):
             person = Person.objects.get(id=person_id)
         except Person.DoesNotExist:
             return Response(
-                data={'status': 'Person with the given ID not found.'},
+                data={'detail': 'Person with the given ID not found.'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -338,22 +339,22 @@ class TeamViewSet(viewsets.ModelViewSet):
         """ Handle POST /teams/{id}/remove_member/ """
         try:
             team = self.get_object()
-            person_id = request.data.get('person_id')
-        except Team.DoesNotExist:
+        except Http404:
             return Response(
-                data={'status': 'Team with the given ID not found.'},
+                data={'detail': 'Team with the given ID not found.'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        person_id = request.data.get('person_id', None)
         try:
             person = Person.objects.get(id=person_id)
         except Person.DoesNotExist:
             return Response(
-                data={'status': 'Person with the given ID not found.'},
+                data={'detail': 'Person with the given ID not found.'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        if person not in team.members:
+        if person not in team.members.all():
             return Response(
                 data={'status': 'Error in the provided data or user is not a team member'},
                 status=status.HTTP_400_BAD_REQUEST
