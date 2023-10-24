@@ -15,4 +15,4 @@ RUN pip install -r requirements.txt
 
 COPY . /app/
 COPY ./generate_secret.sh /generate_secret.sh
-RUN chmod +x /generate_secret.sh && ./generate_secret.sh
+RUN sh /generate_secret.sh
