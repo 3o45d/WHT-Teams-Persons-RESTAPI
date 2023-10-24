@@ -1,8 +1,9 @@
 from pathlib import Path
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-c4re^(d3ibvoc8ir$fbm@iwx@_g*j*tm)5synd#7#(=bk@a9c5'
+SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = True
 ALLOWED_HOSTS = []
@@ -82,7 +83,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'wht_teams.urls.api_info',
-    'DEFAULT_API_URL': 'http://localhost:8000/',  # измените на ваш URL, если он другой
 }
 
 LANGUAGE_CODE = 'en-us'
@@ -91,5 +91,4 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
