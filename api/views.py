@@ -317,6 +317,11 @@ class TeamViewSet(viewsets.ModelViewSet):
                 data={'detail': 'Person with the given ID not found.'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        if person in team.members.all():
+            return Response(
+                data={'status': 'Error in the provided data or user is already a team member'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         team.members.add(person)
         return Response(
